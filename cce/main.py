@@ -42,11 +42,11 @@ def extract_from_buffer(f, max_num_lines: int = 10000):
         if not line:
             # EOF
             break
-        matches = re.match("^[>\s]+[~]{3}", line.lstrip())
+        matches = re.match("^[>\s]*[~]{3}", line.lstrip())
         if matches:
             syntax = line.strip()[matches.span()[1]:]
             num_leading_spaces = len(line) - len(line.lstrip())
-            leading_indent = re.match("^[>\s]+", line.lstrip())
+            leading_indent = re.match("^[>\s]*", line.lstrip())
             lineno = k - 1
             # read the block
             code_block = []
@@ -61,7 +61,7 @@ def extract_from_buffer(f, max_num_lines: int = 10000):
                         f"File too large (> {max_num_lines} lines). Set max_num_lines."
                     )
                 # check if end of block
-                if re.match("^[>\s]+[~]{3}", line.lstrip()):
+                if re.match("^[>\s]*[~]{3}", line.lstrip()):
                     break
                 # Cut leading indents
                 line = line[leading_indent.span()[1]:]
@@ -72,7 +72,7 @@ def extract_from_buffer(f, max_num_lines: int = 10000):
                 raise RuntimeError(
                     "Hit end-of-file prematurely. Syntax error?")
 
-            if re.match("[>\s]+\{:\s*\.language-python\}", line.lstrip()):
+            if re.match("[>\s]*\{:\s*\.language-python\}", line.lstrip()):
                 if previous_line is None:
                     out += "".join(code_block)
                     continue
