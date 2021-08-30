@@ -2,6 +2,7 @@ import argparse
 import contextlib
 import re
 import sys
+import logging
 from contextlib import redirect_stdout
 # namedtuple with default arguments
 # <https://stackoverflow.com/a/18348004/353337>
@@ -113,22 +114,24 @@ def main():
     args = parser.parse_args()
 
     contents = extract_from_file(args.file)
+    if args.output_code:
+        print(contents)
+
     errors = 0
     f = StringIO()
     with redirect_stdout(f):
         try:
             exec(contents)
         except Exception as e:
-            print("Exception occurred while trying to run code: ", e)
-            print("Code: ")
-            print(contents)
+            logging.error("Exception occurred while trying to run code:")
+            logging.error(e, exc_info=True)
+            logging.error("Code: ")
+            logging.error(contents)
             errors = errors + 1
     s = f.getvalue()
     if errors > 0:
-        print(s)
+        logging.error(s)
         sys.exit(errors)
-    elif args.output_code:
-        print(contents)
 
 
 if __name__ == "__main__":
